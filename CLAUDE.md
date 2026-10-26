@@ -18,6 +18,7 @@ If a native GitHub feature fits, use it. If you are unsure which one to use, ask
 
 ## Notes
 
+- Cairn is licensed under AGPLv3 and uses the DCO for contributions: sign off every commit with `git commit -s`.
 - The repo is public. Issues, pull requests and the wiki are visible to everyone, so never put secrets, personal details or customer data in them.
 - The GitHub account is `baggerspion`, and `origin` uses the `github.com-personal` SSH alias. Check `gh auth status` shows `baggerspion` as the active account before using `gh`.
 - Cairn is its own first user. Once the GitHub App exists it is installed on this repo, which is why the repo moves to PR-only changes to `main` (issue #17).
