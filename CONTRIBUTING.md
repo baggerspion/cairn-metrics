@@ -22,6 +22,6 @@ Commits to `main` must also carry a verified signature (GPG, SSH or S/MIME). Tha
 
 ## How to contribute
 
-1. **Start with an issue.** Look at the [open issues](https://github.com/baggerspion/tuig/issues) or open a new one to describe the bug or feature. Larger changes are best discussed first.
+1. **Start with an issue.** Look at the [open issues](https://github.com/tuighq/tuig/issues) or open a new one to describe the bug or feature. Larger changes are best discussed first.
 2. **Open a pull request** that links the issue (`Closes #N`) and keeps to one logical change.
-3. **Documentation and research notes** go in the [wiki](https://github.com/baggerspion/tuig/wiki), not in the repository.
+3. **Documentation and research notes** go in the [wiki](https://github.com/tuighq/tuig/wiki), not in the repository.
