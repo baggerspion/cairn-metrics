@@ -1,0 +1,59 @@
+name: DCO
+
+# Checks that every commit in a pull request carries a Signed-off-by line that
+# matches the commit author, as described in CONTRIBUTING.md. It uses only the
+# GitHub CLI and the API: no third-party actions and no checkout.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  dco:
+    name: DCO
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Signed-off-by on every commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          # The pull request commits API returns at most 250 commits.
+          total=$(gh api "repos/$REPO/pulls/$PR" --jq .commits)
+          if [ "$total" -gt 250 ]; then
+            echo "::error::This pull request has $total commits. The DCO check can read at most 250."
+            exit 1
+          fi
+
+          # Merge commits are skipped. A commit passes when one of its lines is
+          # "Signed-off-by: <author name> <author email>" (case-insensitive).
+          FILTER=$(cat <<'JQ'
+          .[]
+          | select((.parents | length) < 2)
+          | . as $c
+          | ("signed-off-by: " + $c.commit.author.name + " <" + $c.commit.author.email + ">" | ascii_downcase) as $want
+          | select(([$c.commit.message | split("\n")[] | gsub("^\\s+|\\s+$"; "") | ascii_downcase] | index($want)) == null)
+          | "\($c.sha[0:7]) \($c.commit.message | split("\n")[0])"
+          JQ
+          )
+
+          failing=$(gh api --paginate "repos/$REPO/pulls/$PR/commits" --jq "$FILTER")
+
+          if [ -n "$failing" ]; then
+            echo "These commits are missing a matching Signed-off-by line:"
+            echo "$failing" | sed 's/^/  /'
+            echo
+            echo "Sign off the last commit with:  git commit --amend -s --no-edit"
+            echo "Sign off several commits with:  git rebase --signoff <base>"
+            echo "Then push again with:           git push --force-with-lease"
+            exit 1
+          fi
+
+          echo "All commits have a matching Signed-off-by line."
